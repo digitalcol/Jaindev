@@ -26,7 +26,7 @@ import { usePayments } from "@/lib/use-payments";
 import { cn } from "@/lib/utils";
 
 type TowerFilter = number | "unlisted" | "all";
-const LABELS = ["Next", "Following", "After that"] as const;
+const LABELS = ["Next"] as const;
 
 function towerTone(tower: number): string {
   if (tower === 1) return "bg-pitch text-primary-foreground";
@@ -204,7 +204,12 @@ function ScheduleCard() {
       <p className="mt-1 min-h-5 text-sm font-medium tabular-nums">{phrase ?? "\u00a0"}</p>
       <ol className="mt-2 divide-y divide-border">
         {dates.map((day, index) => (
-          <DateRow key={`${day.year}-${day.month}-${day.day}`} day={day} label={LABELS[index] ?? "Later"} lead={index === 0} />
+          <DateRow
+            key={`${day.year}-${day.month}-${day.day}`}
+            day={day}
+            label={index === 0 ? `Next · ${day.name}` : day.name}
+            lead={index === 0}
+          />
         ))}
       </ol>
       </div>

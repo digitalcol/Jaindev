@@ -21,33 +21,20 @@ function weekday(year: number, month: number, day: number): number {
   );
 }
 
-/** Poonam (full-moon) civil dates, India. First Sunday after each is the seva. */
-const POONAM: Civil[] = [
-  { year: 2026, month: 1, day: 3 },
-  { year: 2026, month: 2, day: 1 },
-  { year: 2026, month: 3, day: 3 },
-  { year: 2026, month: 4, day: 2 },
-  { year: 2026, month: 5, day: 1 },
-  { year: 2026, month: 5, day: 31 },
-  { year: 2026, month: 6, day: 29 },
-  { year: 2026, month: 7, day: 29 },
-  { year: 2026, month: 8, day: 28 },
-  { year: 2026, month: 9, day: 26 },
-  { year: 2026, month: 10, day: 26 },
-  { year: 2026, month: 11, day: 24 },
-  { year: 2026, month: 12, day: 23 },
-  { year: 2027, month: 1, day: 22 },
-  { year: 2027, month: 2, day: 20 },
-  { year: 2027, month: 3, day: 22 },
-  { year: 2027, month: 4, day: 20 },
-  { year: 2027, month: 5, day: 20 },
-  { year: 2027, month: 6, day: 18 },
-  { year: 2027, month: 7, day: 18 },
-  { year: 2027, month: 8, day: 17 },
-  { year: 2027, month: 9, day: 15 },
-  { year: 2027, month: 10, day: 15 },
-  { year: 2027, month: 11, day: 13 },
-  { year: 2027, month: 12, day: 13 },
+/** Poonam dates supplied by the sangh. Seva is the next Sunday after each. */
+const POONAM: { name: string; year: number; month: number; day: number }[] = [
+  { name: "Sharad Poornima", year: 2026, month: 10, day: 26 },
+  { name: "Karthik Poornima", year: 2026, month: 11, day: 24 },
+  { name: "Margashirsha Poornima", year: 2026, month: 12, day: 24 },
+  { name: "Paush Poornima", year: 2027, month: 1, day: 22 },
+  { name: "Maagh Poornima", year: 2027, month: 2, day: 20 },
+  { name: "Phagun Poornima", year: 2027, month: 3, day: 22 },
+  { name: "Chaitra Poornima", year: 2027, month: 4, day: 20 },
+  { name: "Vaishakh Poornima", year: 2027, month: 5, day: 20 },
+  { name: "Jyeshta Poornima", year: 2027, month: 6, day: 18 },
+  { name: "Ashadha Poornima", year: 2027, month: 7, day: 18 },
+  { name: "Shravana Poornima", year: 2027, month: 8, day: 16 },
+  { name: "Bhadrapada Poornima", year: 2027, month: 12, day: 15 },
 ];
 
 function addDays(day: Civil, days: number): Civil {
@@ -61,15 +48,17 @@ function firstSundayAfter(poonam: Civil): Civil {
   return addDays(poonam, delta);
 }
 
-/** Next Annadanam dates: first Sunday after Poonam, 12:30 noon India time. */
-export function upcomingSevas(now = new Date(), count = 3): Civil[] {
+export type Seva = Civil & { name: string };
+
+/** Next Annadanam dates: the Sunday after each listed Poonam. */
+export function upcomingSevas(now = new Date(), count = 12): Seva[] {
   const here = kolkataParts(now);
   const today = dayNumber(here.year, here.month, here.day);
-  const out: Civil[] = [];
+  const out: Seva[] = [];
   for (const poonam of POONAM) {
     const seva = firstSundayAfter(poonam);
     if (dayNumber(seva.year, seva.month, seva.day) < today) continue;
-    out.push(seva);
+    out.push({ ...seva, name: poonam.name });
     if (out.length === count) break;
   }
   return out;
