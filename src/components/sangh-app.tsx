@@ -172,7 +172,7 @@ function Intro({ mode }: { mode: "public" | "desk" }) {
       <h1 className="mt-1 text-3xl leading-tight sm:text-5xl">Annadanam Jain Sangh</h1>
       <p className="mt-3 max-w-xl text-base text-primary-foreground/85">
         {mode === "public"
-          ? "Prestige West Woods. Jain food outside the main gate, on the first Sunday of every month, from 12:30 PM."
+          ? "Prestige West Woods. Jain food outside the Exit gate, on the first Sunday after Poonam every month, from 12:30 noon onwards."
           : "Tap a name to mark the ₹2,100 paid or unpaid. Everyone on the public page sees the same mark."}
       </p>
       </div>
@@ -196,10 +196,10 @@ function ScheduleCard() {
       <div className="bg-mint px-5 py-4">
       <p className="flex items-center gap-2 text-sm font-medium">
         <Calendar className="size-4" aria-hidden />
-        First Sunday of every month
+        First Sunday after Poonam
       </p>
       <h2 className="mt-2 text-2xl">Upcoming seva</h2>
-      <p className="mt-1 text-sm">12:30 PM onwards, outside the main gate.</p>
+      <p className="mt-1 text-sm">12:30 noon onwards, outside the Exit gate.</p>
       </div>
       <div className="px-5 py-2">
       <p className="mt-1 min-h-5 text-sm font-medium tabular-nums">{phrase ?? "\u00a0"}</p>
@@ -222,7 +222,7 @@ function DateRow({ day, label, lead }: { day: Civil; label: string; lead: boolea
         <p className={lead ? "text-xl leading-tight sm:text-2xl" : "text-base"}>{parts.date}</p>
         <p className="text-sm text-muted-foreground">{parts.weekday}</p>
       </div>
-      <p className="shrink-0 text-sm tabular-nums text-muted-foreground">12:30</p>
+      <p className="shrink-0 text-sm tabular-nums text-muted-foreground">12:30 noon</p>
     </li>
   );
 }

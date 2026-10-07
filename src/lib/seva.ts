@@ -21,9 +21,58 @@ function weekday(year: number, month: number, day: number): number {
   );
 }
 
-function firstSunday(year: number, month: number): number {
-  const first = weekday(year, month, 1);
-  return first === 0 ? 1 : 1 + (7 - first);
+/** Poonam (full-moon) civil dates, India. First Sunday after each is the seva. */
+const POONAM: Civil[] = [
+  { year: 2026, month: 1, day: 3 },
+  { year: 2026, month: 2, day: 1 },
+  { year: 2026, month: 3, day: 3 },
+  { year: 2026, month: 4, day: 2 },
+  { year: 2026, month: 5, day: 1 },
+  { year: 2026, month: 5, day: 31 },
+  { year: 2026, month: 6, day: 29 },
+  { year: 2026, month: 7, day: 29 },
+  { year: 2026, month: 8, day: 28 },
+  { year: 2026, month: 9, day: 26 },
+  { year: 2026, month: 10, day: 26 },
+  { year: 2026, month: 11, day: 24 },
+  { year: 2026, month: 12, day: 23 },
+  { year: 2027, month: 1, day: 22 },
+  { year: 2027, month: 2, day: 20 },
+  { year: 2027, month: 3, day: 22 },
+  { year: 2027, month: 4, day: 20 },
+  { year: 2027, month: 5, day: 20 },
+  { year: 2027, month: 6, day: 18 },
+  { year: 2027, month: 7, day: 18 },
+  { year: 2027, month: 8, day: 17 },
+  { year: 2027, month: 9, day: 15 },
+  { year: 2027, month: 10, day: 15 },
+  { year: 2027, month: 11, day: 13 },
+  { year: 2027, month: 12, day: 13 },
+];
+
+function addDays(day: Civil, days: number): Civil {
+  const date = new Date(Date.UTC(day.year, day.month - 1, day.day + days));
+  return { year: date.getUTCFullYear(), month: date.getUTCMonth() + 1, day: date.getUTCDate() };
+}
+
+function firstSundayAfter(poonam: Civil): Civil {
+  const dow = weekday(poonam.year, poonam.month, poonam.day);
+  const delta = dow === 0 ? 7 : 7 - dow;
+  return addDays(poonam, delta);
+}
+
+/** Next Annadanam dates: first Sunday after Poonam, 12:30 noon India time. */
+export function upcomingSevas(now = new Date(), count = 3): Civil[] {
+  const here = kolkataParts(now);
+  const today = dayNumber(here.year, here.month, here.day);
+  const out: Civil[] = [];
+  for (const poonam of POONAM) {
+    const seva = firstSundayAfter(poonam);
+    if (dayNumber(seva.year, seva.month, seva.day) < today) continue;
+    out.push(seva);
+    if (out.length === count) break;
+  }
+  return out;
 }
 
 function kolkataParts(now: Date) {
@@ -53,35 +102,13 @@ function dayNumber(year: number, month: number, day: number): number {
   return Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
 }
 
-/** Next Annadanam dates: first Sunday of each month, 12:30 PM India time. */
-export function upcomingSevas(now = new Date(), count = 3): Civil[] {
-  const here = kolkataParts(now);
-  const out: Civil[] = [];
-  let year = here.year;
-  let month = here.month;
-  for (let i = 0; i < 24 && out.length < count; i += 1) {
-    const day = firstSunday(year, month);
-    const past =
-      year < here.year ||
-      (year === here.year && month < here.month) ||
-      (year === here.year && month === here.month && day < here.day);
-    if (!past) out.push({ year, month, day });
-    month += 1;
-    if (month > 12) {
-      month = 1;
-      year += 1;
-    }
-  }
-  return out;
-}
-
 export function sevaPhrase(day: Civil, now = new Date()): string {
   const here = kolkataParts(now);
   const nowMins = dayNumber(here.year, here.month, here.day) * 24 * 60 + here.hour * 60 + here.minute;
   const startMins = dayNumber(day.year, day.month, day.day) * 24 * 60 + 12 * 60 + 30;
   const diff = startMins - nowMins;
   if (here.year === day.year && here.month === day.month && here.day === day.day && diff <= 0) {
-    return "Underway since 12:30 PM";
+    return "Underway since 12:30 noon";
   }
   if (diff <= 0) return "Passed";
   const days = Math.floor(diff / (24 * 60));
