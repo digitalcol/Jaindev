@@ -47,6 +47,7 @@
     min-height: 100%;
     background: var(--color-background);
     color: var(--color-foreground);
+    overflow-x: hidden;
   }
 
   h1,
@@ -75,6 +76,20 @@
   }
   .tap:active:not(:disabled) {
     transform: scale(0.98);
+  }
+  .chip-rail {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    margin-inline: -1rem;
+    padding-inline: 1rem;
+    padding-bottom: 0.25rem;
+  }
+  .chip-rail::-webkit-scrollbar {
+    display: none;
   }
 }
 

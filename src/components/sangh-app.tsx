@@ -120,7 +120,7 @@ export function SanghApp({
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader mode={mode} onLock={onLock} />
-      <main className="mx-auto w-full max-w-5xl px-4 pt-6 pb-16">
+      <main className="mx-auto w-full max-w-5xl px-4 pt-4 pb-[max(4rem,env(safe-area-inset-bottom))]">
         <Intro mode={mode} />
         {mode === "public" ? <ScheduleCard /> : null}
         <Ledger mode={mode} pin={pin} onLock={onLock} />
@@ -137,9 +137,9 @@ export function SanghApp({
 function SiteHeader({ mode, onLock }: { mode: "public" | "desk" | "gate"; onLock?: () => void }) {
   return (
     <header className="sticky top-0 z-30 bg-background/90 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-5xl items-center justify-between gap-3 px-4">
+      <div className="mx-auto flex min-h-16 max-w-5xl items-center justify-between gap-2 px-4 py-2">
         <Link to="/" className="min-w-0">
-          <span className="block text-xl font-semibold leading-tight">Annadanam</span>
+          <span className="block text-lg font-semibold leading-tight sm:text-xl">Annadanam</span>
           <span className="block text-xs text-muted-foreground">Jain Sangh</span>
         </Link>
         {mode === "public" ? (
@@ -147,14 +147,14 @@ function SiteHeader({ mode, onLock }: { mode: "public" | "desk" | "gate"; onLock
             Sangh desk
           </Link>
         ) : (
-          <span className="flex items-center gap-2">
+          <span className="flex shrink-0 items-center gap-1">
             <Link to="/" className={buttonVariants({ variant: "ghost", size: "sm" })}>
-              Public page
+              Public
             </Link>
             {mode === "desk" ? (
-              <Button type="button" variant="outline" size="sm" onClick={onLock}>
+              <Button type="button" variant="outline" size="sm" onClick={onLock} aria-label="Lock desk">
                 <Lock className="size-4" aria-hidden />
-                Lock
+                <span className="hidden sm:inline">Lock</span>
               </Button>
             ) : null}
           </span>
@@ -169,7 +169,7 @@ function Intro({ mode }: { mode: "public" | "desk" }) {
     <section className="overflow-hidden rounded-2xl bg-pitch text-primary-foreground">
       <div className="px-5 py-6 sm:px-6">
       <p className="text-sm font-medium text-sun">Jai Jinendra</p>
-      <h1 className="mt-1 text-4xl sm:text-5xl">Annadanam Jain Sangh</h1>
+      <h1 className="mt-1 text-3xl leading-tight sm:text-5xl">Annadanam Jain Sangh</h1>
       <p className="mt-3 max-w-xl text-base text-primary-foreground/85">
         {mode === "public"
           ? "Prestige West Woods. Jain food outside the main gate, on the first Sunday of every month, from 12:30 PM."
@@ -216,13 +216,13 @@ function ScheduleCard() {
 function DateRow({ day, label, lead }: { day: Civil; label: string; lead: boolean }) {
   const parts = formatSevaParts(day);
   return (
-    <li className="flex items-baseline justify-between gap-4 py-3">
+    <li className="flex items-baseline justify-between gap-3 py-3">
       <div className="min-w-0">
         <p className="text-sm text-muted-foreground">{label}</p>
-        <p className={lead ? "text-2xl leading-tight" : "text-base"}>{parts.date}</p>
+        <p className={lead ? "text-xl leading-tight sm:text-2xl" : "text-base"}>{parts.date}</p>
         <p className="text-sm text-muted-foreground">{parts.weekday}</p>
       </div>
-      <p className="shrink-0 text-sm tabular-nums text-muted-foreground">12:30 PM</p>
+      <p className="shrink-0 text-sm tabular-nums text-muted-foreground">12:30</p>
     </li>
   );
 }
@@ -384,8 +384,8 @@ function Ledger({
                 <span className="text-sm font-medium">Tower {item}</span>
                 <span className="mt-1 block text-3xl leading-none tabular-nums">{list.length}</span>
               </span>
-              <span className="block px-3 py-2 text-xs tabular-nums text-muted-foreground">
-                {paid === null ? "Paid —" : `${paid} paid · ${list.length - paid} unpaid`}
+              <span className="block px-3 py-2 text-xs leading-snug tabular-nums text-muted-foreground">
+                {paid === null ? "Paid —" : `${paid} paid · ${list.length - paid} due`}
               </span>
             </button>
           );
@@ -421,7 +421,7 @@ function Ledger({
             </button>
           ) : null}
         </div>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="chip-rail mt-3">
           <Chip pressed={tower === "all"} onClick={() => setTower("all")}>
             All towers
           </Chip>
@@ -434,7 +434,7 @@ function Ledger({
             No flat
           </Chip>
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="chip-rail mt-2">
           <Chip pressed={status === "all"} onClick={() => setStatus("all")}>
             All
           </Chip>
@@ -447,7 +447,7 @@ function Ledger({
         </div>
       </div>
       ) : (
-        <div className="mt-8 flex flex-wrap gap-2">
+        <div className="chip-rail mt-8">
           <Chip pressed={tower === "all"} onClick={() => setTower("all")}>
             All towers
           </Chip>
@@ -523,7 +523,7 @@ function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-2xl bg-card px-4 py-3">
       <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="mt-1 text-2xl leading-none tabular-nums">{value}</p>
+      <p className="mt-1 text-lg leading-none tabular-nums sm:text-2xl">{value}</p>
     </div>
   );
 }
@@ -543,7 +543,7 @@ function Chip({
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        "tap inline-flex h-10 items-center gap-1 rounded-full px-3 text-sm font-medium",
+        "tap inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-4 text-sm font-medium",
         pressed ? "bg-secondary text-secondary-foreground" : "bg-card text-foreground",
       )}
     >
