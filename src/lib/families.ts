@@ -95,7 +95,7 @@ export const FAMILIES: Family[] = [
   { id: "67", name: "Ashok Bhai Sahil", flats: [flat("2063")], note: "Laxmi Gold" },
   { id: "68", name: "Mahendra Bhai", flats: [flat("3043")] },
   { id: "69", name: "Naina Hitesh Punamiya", flats: [flat("5193")] },
-  { id: "70", name: "Sushil Kantilal Surana", flats: [flat("2082"), flat("3166")] },
+  { id: "70", name: "Sushil Kantilal Surana", flats: [flat("2082")] },
   { id: "71", name: "Rahul Ramesh Kumar", flats: [flat("3045")] },
   { id: "72", name: "Ankush M Doshi", flats: [flat("1181")] },
   { id: "73", name: "Sunil Agarwal", flats: [flat("2144")] },
