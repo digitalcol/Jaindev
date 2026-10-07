@@ -88,7 +88,7 @@ export const FAMILIES: Family[] = [
   { id: "60", name: "Ashish", flats: [flat("3155")] },
   { id: "61", name: "Deepak Kantilal Chandaliya", flats: [flat("5093")] },
   { id: "62", name: "Ravindra Bhai", flats: [flat("2196")] },
-  { id: "63", name: "Sha Mishrimalji Ranawat and Sons", flats: [flat("1251"), flat("4182")] },
+  { id: "63", name: "Sha Mishrimalji Ranawat and Sons", flats: [flat("1251")] },
   { id: "64", name: "Ravi Agarwal", flats: [flat("2095")] },
   { id: "65", name: "Rohita R Shah", flats: [flat("4106")] },
   { id: "66", name: "Raksha B Shah", flats: [flat("4102")] },
