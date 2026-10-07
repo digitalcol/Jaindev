@@ -493,14 +493,19 @@ function Ledger({
             {unlisted.length === 0 ? (
               <p className="mt-3 text-sm text-muted-foreground">No one in this view.</p>
             ) : (
-              <FamilyTable
-                families={unlisted}
-                tower={null}
-                mode={mode}
-                stateOf={stateOf}
-                disabled={!known || writing}
-                onToggle={toggle}
-              />
+              <ul className="mt-3 space-y-2">
+                {unlisted.map((family) => (
+                  <FamilyRow
+                    key={family.id}
+                    family={family}
+                    tower={null}
+                    mode={mode}
+                    state={stateOf(family.id)}
+                    disabled={!known || writing}
+                    onToggle={() => toggle(family)}
+                  />
+                ))}
+              </ul>
             )}
           </section>
         ) : null}
@@ -586,89 +591,26 @@ function TowerBlock({
       {groups.map((group) => (
         <div key={group.floor}>
           <h4 className="mt-4 text-sm font-medium text-muted-foreground">Floor {group.floor}</h4>
-          <FamilyTable
-            families={group.families}
-            tower={tower}
-            mode={mode}
-            stateOf={stateOf}
-            disabled={!known || writing}
-            onToggle={onToggle}
-          />
+          <ul className="mt-2 space-y-2">
+            {group.families.map((family) => (
+              <FamilyRow
+                key={family.id}
+                family={family}
+                tower={tower}
+                mode={mode}
+                state={stateOf(family.id)}
+                disabled={!known || writing}
+                onToggle={() => onToggle(family)}
+              />
+            ))}
+          </ul>
         </div>
       ))}
     </section>
   );
 }
 
-function FamilyTable({
-  families,
-  tower,
-  mode,
-  stateOf,
-  disabled,
-  onToggle,
-}: {
-  families: Family[];
-  tower: number | null;
-  mode: "public" | "desk";
-  stateOf: (id: string) => boolean | null;
-  disabled: boolean;
-  onToggle: (family: Family) => void;
-}) {
-  return (
-    <>
-      <div className="mt-2 hidden overflow-hidden rounded-2xl bg-card md:block">
-        <table className="w-full border-collapse text-left text-sm">
-          <thead className="bg-muted text-xs text-muted-foreground">
-            <tr>
-              <th className="px-4 py-3 font-medium">Name</th>
-              <th className="px-3 py-3 font-medium">Flat</th>
-              <th className="px-3 py-3 font-medium">Tower</th>
-              <th className="px-3 py-3 font-medium">Floor</th>
-              <th className="px-3 py-3 font-medium">House</th>
-              <th className="px-4 py-3 font-medium">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {families.map((family) => (
-              <FamilyTableRow
-                key={family.id}
-                family={family}
-                tower={tower}
-                mode={mode}
-                state={stateOf(family.id)}
-                disabled={disabled}
-                onToggle={() => onToggle(family)}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <ul className="mt-2 space-y-2 md:hidden">
-        {families.map((family) => (
-          <FamilyCard
-            key={family.id}
-            family={family}
-            tower={tower}
-            mode={mode}
-            state={stateOf(family.id)}
-            disabled={disabled}
-            onToggle={() => onToggle(family)}
-          />
-        ))}
-      </ul>
-    </>
-  );
-}
-
-function flatsFor(family: Family, tower: number | null) {
-  return [...family.flats].sort((a, b) => {
-    if (tower === null) return 0;
-    return Number(b.tower === tower) - Number(a.tower === tower);
-  });
-}
-
-function FamilyTableRow({
+function FamilyRow({
   family,
   tower,
   mode,
@@ -683,75 +625,10 @@ function FamilyTableRow({
   disabled: boolean;
   onToggle: () => void;
 }) {
-  const flats = flatsFor(family, tower);
-  const cells = (
-    <>
-      <td className="px-4 py-3 font-medium">{family.name}</td>
-      <td className="px-3 py-3 tabular-nums">
-        {flats.length === 0 ? family.note ?? "—" : flats.map((item) => item.code).join(", ")}
-      </td>
-      <td className="px-3 py-3 tabular-nums">{flats.map((item) => item.tower).join(", ") || "—"}</td>
-      <td className="px-3 py-3 tabular-nums">{flats.map((item) => item.floor).join(", ") || "—"}</td>
-      <td className="px-3 py-3 tabular-nums">{flats.map((item) => item.house).join(", ") || "—"}</td>
-      <td className="px-4 py-3">
-        <StatusBadge state={state} />
-      </td>
-    </>
-  );
+  const body = <FamilyBody family={family} tower={tower} state={state} />;
   if (mode === "public") {
-    return <tr className="border-t border-border">{cells}</tr>;
+    return <li className="rounded-2xl bg-card px-4 py-3">{body}</li>;
   }
-  return (
-    <tr
-      className="tap cursor-pointer border-t border-border hover:bg-accent disabled:opacity-60"
-      onClick={disabled ? undefined : onToggle}
-      aria-disabled={disabled}
-    >
-      {cells}
-    </tr>
-  );
-}
-
-function FamilyCard({
-  family,
-  tower,
-  mode,
-  state,
-  disabled,
-  onToggle,
-}: {
-  family: Family;
-  tower: number | null;
-  mode: "public" | "desk";
-  state: boolean | null;
-  disabled: boolean;
-  onToggle: () => void;
-}) {
-  const flats = flatsFor(family, tower);
-  const body = (
-    <div className="grid grid-cols-2 gap-x-3 gap-y-2">
-      <div className="col-span-2 flex items-start justify-between gap-3">
-        <p className="min-w-0 text-base font-medium leading-snug">{family.name}</p>
-        <StatusBadge state={state} />
-      </div>
-      {flats.length === 0 ? (
-        <p className="col-span-2 text-sm text-muted-foreground">{family.note ?? "Flat not on the list"}</p>
-      ) : (
-        flats.map((item) => (
-          <div key={item.code} className="col-span-2 grid grid-cols-4 gap-2 text-sm">
-            <Cell label="Flat" value={item.code} />
-            <Cell label="Tower" value={String(item.tower)} />
-            <Cell label="Floor" value={String(item.floor)} />
-            <Cell label="House" value={String(item.house)} />
-          </div>
-        ))
-      )}
-      {family.note && flats.length > 0 ? (
-        <p className="col-span-2 text-sm text-muted-foreground">{family.note}</p>
-      ) : null}
-    </div>
-  );
-  if (mode === "public") return <li className="rounded-2xl bg-card px-4 py-3">{body}</li>;
   const label =
     state === null
       ? `${family.name}, payment still loading`
@@ -772,11 +649,38 @@ function FamilyCard({
   );
 }
 
-function Cell({ label, value }: { label: string; value: string }) {
+function FamilyBody({
+  family,
+  tower,
+  state,
+}: {
+  family: Family;
+  tower: number | null;
+  state: boolean | null;
+}) {
+  const flats = [...family.flats].sort((a, b) => {
+    if (tower === null) return 0;
+    return Number(b.tower === tower) - Number(a.tower === tower);
+  });
   return (
-    <div className="min-w-0">
-      <p className="text-[11px] text-muted-foreground">{label}</p>
-      <p className="tabular-nums font-medium">{value}</p>
+    <div className="flex items-start justify-between gap-3">
+      <div className="min-w-0">
+        <p className="text-base font-medium leading-snug">{family.name}</p>
+        {flats.length === 0 ? (
+          <p className="mt-1 text-sm text-muted-foreground">{family.note ?? "Flat not on the list"}</p>
+        ) : (
+          <div className="mt-1 space-y-0.5">
+            {flats.map((item) => (
+              <p key={item.code} className="text-sm leading-snug text-muted-foreground">
+                <span className="font-medium tabular-nums text-foreground">{item.code}</span>
+                {` · Tower ${item.tower}, floor ${item.floor}, house ${item.house}`}
+              </p>
+            ))}
+            {family.note ? <p className="text-sm text-muted-foreground">{family.note}</p> : null}
+          </div>
+        )}
+      </div>
+      <StatusBadge state={state} />
     </div>
   );
 }
