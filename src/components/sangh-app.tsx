@@ -140,7 +140,6 @@ function SiteHeader({ mode, onLock }: { mode: "public" | "desk" | "gate"; onLock
       <div className="mx-auto flex min-h-16 max-w-5xl items-center justify-between gap-2 px-4 py-2">
         <Link to="/" className="min-w-0">
           <span className="block text-lg font-semibold leading-tight sm:text-xl">Annadanam</span>
-          <span className="block text-xs text-muted-foreground">Jain Sangh</span>
         </Link>
         {mode === "public" ? (
           <Link to="/admin" className={buttonVariants({ variant: "outline", size: "sm" })}>
@@ -169,7 +168,7 @@ function Intro({ mode }: { mode: "public" | "desk" }) {
     <section className="overflow-hidden rounded-2xl bg-pitch text-primary-foreground">
       <div className="px-5 py-6 sm:px-6">
       <p className="text-sm font-medium text-sun">Jai Jinendra</p>
-      <h1 className="mt-1 text-3xl leading-tight sm:text-5xl">Annadanam Jain Sangh</h1>
+      <h1 className="mt-1 text-3xl leading-tight sm:text-5xl">Annadanam</h1>
       <p className="mt-3 max-w-xl text-base text-primary-foreground/85">
         {mode === "public"
           ? "Prestige West Woods. Jain food outside the Exit gate, on the first Sunday after Poonam every month, from 12:30 noon onwards."
