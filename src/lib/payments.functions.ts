@@ -8,14 +8,23 @@ function isPaidValue(value: boolean | string | number): boolean {
 }
 
 export const listPayments = createServerFn({ method: "GET" }).handler(async () => {
-  const sql = await getSql();
-  const rows = await sql<{ family_id: string; paid: boolean | string | number }>`
-    select family_id, paid from membership_payments
-  `;
-  return rows.map((row) => ({
-    id: row.family_id,
-    paid: isPaidValue(row.paid),
-  }));
+  try {
+    const sql = await Promise.race([
+      getSql(),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("payments timed out")), 8000);
+      }),
+    ]);
+    const rows = await sql<{ family_id: string; paid: boolean | string | number }>`
+      select family_id, paid from membership_payments
+    `;
+    return rows.map((row) => ({
+      id: row.family_id,
+      paid: isPaidValue(row.paid),
+    }));
+  } catch {
+    return [];
+  }
 });
 
 export const checkPin = createServerFn({ method: "POST" })

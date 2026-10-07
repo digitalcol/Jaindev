@@ -31,7 +31,7 @@ export function usePayments() {
 
   useEffect(() => {
     void load();
-    const id = window.setInterval(() => void load(), 15000);
+    const id = window.setInterval(() => void load(), 5000);
     const onFocus = () => void load();
     window.addEventListener("focus", onFocus);
     return () => {
@@ -61,5 +61,5 @@ export function usePayments() {
     }
   }, []);
 
-  return { marks, known: ready && !error, error: ready && error, writing, mark };
+  return { marks, known: ready, error: ready && error, writing, mark };
 }
