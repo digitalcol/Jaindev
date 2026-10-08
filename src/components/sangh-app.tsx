@@ -668,24 +668,24 @@ function FamilyBody({
     return Number(b.tower === tower) - Number(a.tower === tower);
   });
   return (
-    <div className="flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <p className="text-base font-medium leading-snug">{family.name}</p>
-        {flats.length === 0 ? (
-          <p className="mt-1 text-sm text-muted-foreground">{family.note ?? "Flat not on the list"}</p>
-        ) : (
-          <div className="mt-1 space-y-0.5">
-            {flats.map((item) => (
-              <p key={item.code} className="text-sm leading-snug text-muted-foreground">
-                <span className="font-medium tabular-nums text-foreground">{item.code}</span>
-                {` · Tower ${item.tower}, floor ${item.floor}, house ${item.house}`}
-              </p>
-            ))}
-            {family.note ? <p className="text-sm text-muted-foreground">{family.note}</p> : null}
-          </div>
-        )}
+    <div>
+      <div className="flex items-start justify-between gap-3">
+        <p className="min-w-0 text-base font-medium leading-snug">{family.name}</p>
+        <StatusBadge state={state} />
       </div>
-      <StatusBadge state={state} />
+      {flats.length === 0 ? (
+        <p className="mt-1 text-sm text-muted-foreground">{family.note ?? "Flat not on the list"}</p>
+      ) : (
+        <div className="mt-1 space-y-0.5">
+          {flats.map((item) => (
+            <p key={item.code} className="text-sm leading-snug whitespace-nowrap text-muted-foreground">
+              <span className="font-medium tabular-nums text-foreground">{item.code}</span>
+              {` · Tower ${item.tower}, floor ${item.floor}, house ${item.house}`}
+            </p>
+          ))}
+          {family.note ? <p className="text-sm text-muted-foreground">{family.note}</p> : null}
+        </div>
+      )}
     </div>
   );
 }
