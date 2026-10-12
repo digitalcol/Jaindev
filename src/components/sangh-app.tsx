@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar, Check, Lock, Search, X } from "lucide-react";
+import { Calendar, Check, Download, Lock, Search, X } from "lucide-react";
 import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -630,15 +630,16 @@ function FamilyRow({
   disabled: boolean;
   onToggle: () => void;
 }) {
-  const body = <FamilyBody family={family} tower={tower} state={state} />;
-  const download = family.id === "1" ? <StatusDownload /> : null;
+  const body = (
+    <FamilyBody
+      family={family}
+      tower={tower}
+      state={state}
+      download={mode === "public" && family.id === "1" ? <StatusDownload /> : null}
+    />
+  );
   if (mode === "public") {
-    return (
-      <li className="rounded-2xl bg-card px-4 py-3">
-        {body}
-        {download}
-      </li>
-    );
+    return <li className="rounded-2xl bg-card px-4 py-3">{body}</li>;
   }
   const label =
     state === null
@@ -656,7 +657,6 @@ function FamilyRow({
       >
         {body}
       </button>
-      {download}
     </li>
   );
 }
@@ -666,9 +666,11 @@ function StatusDownload() {
     <a
       href="/status/bipin-bafna.png"
       download="Bipin-Bafna-Annadanam.png"
-      className="mt-3 inline-flex rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground"
+      aria-label="Download WhatsApp status"
+      title="WhatsApp status"
+      className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground"
     >
-      Download status
+      <Download className="size-4" aria-hidden />
     </a>
   );
 }
@@ -677,10 +679,12 @@ function FamilyBody({
   family,
   tower,
   state,
+  download,
 }: {
   family: Family;
   tower: number | null;
   state: boolean | null;
+  download?: React.ReactNode;
 }) {
   const flats = [...family.flats].sort((a, b) => {
     if (tower === null) return 0;
@@ -690,7 +694,10 @@ function FamilyBody({
     <div>
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <p className="text-base font-medium leading-snug">{family.name}</p>
+          <div className="flex items-center gap-2">
+            <p className="min-w-0 text-base font-medium leading-snug">{family.name}</p>
+            {download}
+          </div>
           {state === true ? (
             <p className="mt-1 text-sm text-primary">The Sangh thanks you for your contribution.</p>
           ) : null}
