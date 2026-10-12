@@ -631,8 +631,14 @@ function FamilyRow({
   onToggle: () => void;
 }) {
   const body = <FamilyBody family={family} tower={tower} state={state} />;
+  const download = family.id === "1" ? <StatusDownload /> : null;
   if (mode === "public") {
-    return <li className="rounded-2xl bg-card px-4 py-3">{body}</li>;
+    return (
+      <li className="rounded-2xl bg-card px-4 py-3">
+        {body}
+        {download}
+      </li>
+    );
   }
   const label =
     state === null
@@ -650,7 +656,20 @@ function FamilyRow({
       >
         {body}
       </button>
+      {download}
     </li>
+  );
+}
+
+function StatusDownload() {
+  return (
+    <a
+      href="/status/bipin-bafna.png"
+      download="Bipin-Bafna-Annadanam.png"
+      className="mt-3 inline-flex rounded-full bg-secondary px-3 py-1.5 text-sm font-medium text-secondary-foreground"
+    >
+      Download status
+    </a>
   );
 }
 
