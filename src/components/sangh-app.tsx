@@ -670,7 +670,12 @@ function FamilyBody({
   return (
     <div>
       <div className="flex items-start justify-between gap-3">
-        <p className="min-w-0 text-base font-medium leading-snug">{family.name}</p>
+        <div className="min-w-0">
+          <p className="text-base font-medium leading-snug">{family.name}</p>
+          {state === true ? (
+            <p className="mt-1 text-sm text-primary">The Sangh thanks you for your contribution.</p>
+          ) : null}
+        </div>
         <StatusBadge state={state} />
       </div>
       {flats.length === 0 ? (
