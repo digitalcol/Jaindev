@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Calendar, Check, Download, Lock, Search, X } from "lucide-react";
+import { Calendar, Check, Lock, Search, X } from "lucide-react";
 import { type FormEvent, type ReactNode, useEffect, useId, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -630,14 +630,7 @@ function FamilyRow({
   disabled: boolean;
   onToggle: () => void;
 }) {
-  const body = (
-    <FamilyBody
-      family={family}
-      tower={tower}
-      state={state}
-      download={mode === "public" && family.id === "1" ? <StatusDownload /> : null}
-    />
-  );
+  const body = <FamilyBody family={family} tower={tower} state={state} />;
   if (mode === "public") {
     return <li className="rounded-2xl bg-card px-4 py-3">{body}</li>;
   }
@@ -661,30 +654,14 @@ function FamilyRow({
   );
 }
 
-function StatusDownload() {
-  return (
-    <a
-      href="/status/bipin-bafna.png"
-      download="Bipin-Bafna-Annadanam.png"
-      aria-label="Download WhatsApp status"
-      title="WhatsApp status"
-      className="inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-secondary text-secondary-foreground"
-    >
-      <Download className="size-4" aria-hidden />
-    </a>
-  );
-}
-
 function FamilyBody({
   family,
   tower,
   state,
-  download,
 }: {
   family: Family;
   tower: number | null;
   state: boolean | null;
-  download?: React.ReactNode;
 }) {
   const flats = [...family.flats].sort((a, b) => {
     if (tower === null) return 0;
@@ -693,15 +670,7 @@ function FamilyBody({
   return (
     <div>
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="min-w-0 text-base font-medium leading-snug">{family.name}</p>
-            {download}
-          </div>
-          {state === true ? (
-            <p className="mt-1 text-sm text-primary">The Sangh thanks you for your contribution.</p>
-          ) : null}
-        </div>
+        <p className="min-w-0 text-base font-medium leading-snug">{family.name}</p>
         <StatusBadge state={state} />
       </div>
       {flats.length === 0 ? (
