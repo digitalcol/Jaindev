@@ -91,6 +91,14 @@
   .chip-rail::-webkit-scrollbar {
     display: none;
   }
+  @media (max-width: 767px) {
+    .chip-rail {
+      flex-wrap: wrap;
+      overflow: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+    }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -547,7 +547,7 @@ function Chip({
       aria-pressed={pressed}
       onClick={onClick}
       className={cn(
-        "tap inline-flex h-11 shrink-0 items-center gap-1 rounded-full px-4 text-sm font-medium",
+        "tap inline-flex h-11 shrink-0 items-center justify-center gap-1 rounded-full px-4 text-sm font-medium max-md:h-auto max-md:min-h-11 max-md:shrink max-md:grow max-md:basis-[calc(20%-0.4rem)] max-md:px-1 max-md:text-center max-md:text-xs max-md:leading-tight",
         pressed ? "bg-secondary text-secondary-foreground" : "bg-card text-foreground",
       )}
     >
