@@ -240,7 +240,7 @@ function Ledger({
   pin?: string;
   onLock?: () => void;
 }) {
-  const { marks, known, error, writing, mark } = usePayments();
+  const { marks, paidAt, known, error, writing, mark } = usePayments();
   const [tower, setTower] = useState<TowerFilter>("all");
   const [status, setStatus] = useState<StatusFilter>("all");
   const [query, setQuery] = useState("");
@@ -255,6 +255,25 @@ function Ledger({
   function stateOf(id: string): boolean | null {
     if (!known) return null;
     return marks[id] === true;
+  }
+
+  function receivedOf(id: string): string | null {
+    if (mode !== "desk" || marks[id] !== true) return null;
+    const at = paidAt[id];
+    if (!at) return null;
+    const date = new Date(at);
+    if (Number.isNaN(date.getTime())) return null;
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Kolkata",
+      day: "2-digit",
+      month: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    }).formatToParts(date);
+    const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((item) => item.type === type)?.value ?? "";
+    const label = `${part("day")}/${part("month")}, ${part("hour")}:${part("minute")}`;
+    return label.includes("undefined") ? null : label;
   }
 
   function matches(family: Family): boolean {
@@ -488,6 +507,7 @@ function Ledger({
               writing={writing}
               known={known}
               stateOf={stateOf}
+              receivedOf={receivedOf}
               onToggle={toggle}
             />
           ),
@@ -506,6 +526,7 @@ function Ledger({
                     tower={null}
                     mode={mode}
                     state={stateOf(family.id)}
+                    received={receivedOf(family.id)}
                     disabled={!known || writing}
                     onToggle={() => toggle(family)}
                   />
@@ -566,6 +587,7 @@ function TowerBlock({
   writing,
   known,
   stateOf,
+  receivedOf,
   onToggle,
 }: {
   id: string;
@@ -576,6 +598,7 @@ function TowerBlock({
   writing: boolean;
   known: boolean;
   stateOf: (id: string) => boolean | null;
+  receivedOf: (id: string) => string | null;
   onToggle: (family: Family) => void;
 }) {
   const groups: { floor: number; families: Family[] }[] = [];
@@ -604,6 +627,7 @@ function TowerBlock({
                 tower={tower}
                 mode={mode}
                 state={stateOf(family.id)}
+                received={receivedOf(family.id)}
                 disabled={!known || writing}
                 onToggle={() => onToggle(family)}
               />
@@ -620,6 +644,7 @@ function FamilyRow({
   tower,
   mode,
   state,
+  received,
   disabled,
   onToggle,
 }: {
@@ -627,10 +652,11 @@ function FamilyRow({
   tower: number | null;
   mode: "public" | "desk";
   state: boolean | null;
+  received: string | null;
   disabled: boolean;
   onToggle: () => void;
 }) {
-  const body = <FamilyBody family={family} tower={tower} state={state} />;
+  const body = <FamilyBody family={family} tower={tower} state={state} received={received} />;
   if (mode === "public") {
     return <li className="rounded-2xl bg-card px-4 py-3">{body}</li>;
   }
@@ -658,10 +684,12 @@ function FamilyBody({
   family,
   tower,
   state,
+  received,
 }: {
   family: Family;
   tower: number | null;
   state: boolean | null;
+  received: string | null;
 }) {
   const flats = [...family.flats].sort((a, b) => {
     if (tower === null) return 0;
@@ -673,6 +701,7 @@ function FamilyBody({
         <p className="min-w-0 text-base font-medium leading-snug">{family.name}</p>
         <StatusBadge state={state} />
       </div>
+      {received ? <p className="mt-1 text-sm tabular-nums text-muted-foreground">Received {received}</p> : null}
       {flats.length === 0 ? (
         <p className="mt-1 text-sm text-muted-foreground">{family.note ?? "Flat not on the list"}</p>
       ) : (

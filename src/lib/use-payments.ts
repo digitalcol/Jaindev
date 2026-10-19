@@ -3,6 +3,7 @@ import { listPayments, setPayment } from "@/lib/payments.functions";
 
 export function usePayments() {
   const [marks, setMarks] = useState<Record<string, boolean>>({});
+  const [paidAt, setPaidAt] = useState<Record<string, string | null>>({});
   const [ready, setReady] = useState(false);
   const [error, setError] = useState(false);
   const [writing, setWriting] = useState(false);
@@ -17,8 +18,13 @@ export function usePayments() {
       const rows = await listPayments();
       if (pending.current > 0 || seen !== epoch.current) return;
       const next: Record<string, boolean> = {};
-      for (const row of rows) next[row.id] = row.paid;
+      const times: Record<string, string | null> = {};
+      for (const row of rows) {
+        next[row.id] = row.paid;
+        times[row.id] = row.paidAt;
+      }
       setMarks(next);
+      setPaidAt(times);
       loadedOnce.current = true;
       setError(false);
     } catch {
@@ -45,15 +51,21 @@ export function usePayments() {
     epoch.current += 1;
     setWriting(true);
     setMarks((current) => ({ ...current, [id]: next }));
+    setPaidAt((current) => ({ ...current, [id]: next ? new Date().toISOString() : null }));
     try {
       const result = await setPayment({ data: { id, paid: next, pin } });
       if (!result.ok) {
         setMarks((current) => ({ ...current, [id]: !next }));
+        setPaidAt((current) => ({ ...current, [id]: next ? null : current[id] ?? null }));
         return result;
+      }
+      if (result.paidAt !== undefined) {
+        setPaidAt((current) => ({ ...current, [id]: result.paidAt }));
       }
       return result;
     } catch (error) {
       setMarks((current) => ({ ...current, [id]: !next }));
+      setPaidAt((current) => ({ ...current, [id]: next ? null : current[id] ?? null }));
       throw error;
     } finally {
       pending.current -= 1;
@@ -61,5 +73,5 @@ export function usePayments() {
     }
   }, []);
 
-  return { marks, known: ready, error: ready && error, writing, mark };
+  return { marks, paidAt, known: ready, error: ready && error, writing, mark };
 }

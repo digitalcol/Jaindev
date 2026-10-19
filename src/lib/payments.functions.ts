@@ -7,6 +7,13 @@ function isPaidValue(value: boolean | string | number): boolean {
   return value === true || value === "t" || value === "true" || value === 1;
 }
 
+function asIso(value: unknown): string | null {
+  if (value == null) return null;
+  const date = value instanceof Date ? value : new Date(String(value));
+  if (Number.isNaN(date.getTime())) return null;
+  return date.toISOString();
+}
+
 export const listPayments = createServerFn({ method: "GET" }).handler(async () => {
   try {
     const sql = await Promise.race([
@@ -15,13 +22,21 @@ export const listPayments = createServerFn({ method: "GET" }).handler(async () =
         setTimeout(() => reject(new Error("payments timed out")), 8000);
       }),
     ]);
-    const rows = await sql<{ family_id: string; paid: boolean | string | number }>`
-      select family_id, paid from membership_payments
+    const rows = await sql<{
+      family_id: string;
+      paid: boolean | string | number;
+      updated_at: Date | string | null;
+    }>`
+      select family_id, paid, updated_at from membership_payments
     `;
-    return rows.map((row) => ({
-      id: row.family_id,
-      paid: isPaidValue(row.paid),
-    }));
+    return rows.map((row) => {
+      const paid = isPaidValue(row.paid);
+      return {
+        id: row.family_id,
+        paid,
+        paidAt: paid ? asIso(row.updated_at) : null,
+      };
+    });
   } catch {
     return [];
   }
@@ -52,11 +67,12 @@ export const setPayment = createServerFn({ method: "POST" })
     }
     if (!isFamilyId(data.id)) return { ok: false as const, reason: "unknown" as const };
     const sql = await getSql();
+    const paidAt = data.paid ? new Date().toISOString() : null;
     await sql`
-      insert into membership_payments (family_id, paid)
-      values (${data.id}, ${data.paid})
+      insert into membership_payments (family_id, paid, updated_at)
+      values (${data.id}, ${data.paid}, now())
       on conflict (family_id) do update
       set paid = excluded.paid, updated_at = now()
     `;
-    return { ok: true as const, id: data.id, paid: data.paid };
+    return { ok: true as const, id: data.id, paid: data.paid, paidAt };
   });

@@ -132,6 +132,8 @@ export const FAMILIES: Family[] = [
   { id: "104", name: "Naveen Deepti Ganna", flats: [flat("2226")] },
   { id: "105", name: "Manjula Ben Girish Parekh", flats: [flat("1161")] },
   { id: "106", name: "Smitha Sapani", flats: [flat("2074")] },
+  { id: "107", name: "Umashankar", flats: [flat("5203")] },
+  { id: "108", name: "Uday Shetty", flats: [flat("1081")] },
 ];
 
 const IDS = new Set(FAMILIES.map((family) => family.id));
