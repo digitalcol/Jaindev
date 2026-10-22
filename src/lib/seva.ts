@@ -34,7 +34,6 @@ const POONAM: { name: string; year: number; month: number; day: number }[] = [
   { name: "Jyeshta Poornima", year: 2027, month: 6, day: 18 },
   { name: "Ashadha Poornima", year: 2027, month: 7, day: 18 },
   { name: "Shravana Poornima", year: 2027, month: 8, day: 16 },
-  { name: "Bhadrapada Poornima", year: 2027, month: 12, day: 15 },
 ];
 
 function addDays(day: Civil, days: number): Civil {
